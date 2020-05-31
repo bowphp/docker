@@ -1,0 +1,27 @@
+version: "3"
+services:
+  web:
+    image: bowphp/bowcker:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./:/var/www
+    links:
+      - db
+      - mail
+  db:
+    container_name: mysql
+    command: --default-authentication-plugin=mysql_native_password --max_allowed_packet=1073741824
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_USERNAME: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+  mail:
+    container_name: mail
+    image: maildev/maildev
+    ports:
+      - "1025:25"
+      - "1080:80"
