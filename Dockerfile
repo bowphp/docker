@@ -1,4 +1,5 @@
-FROM php:7.1-alpine
+FROM php:8.1-alpine
+
 LABEL maintainer "Franck DAKIA <dakiafranck@gmail.com>"
 
 # Install dev dependencies
@@ -60,6 +61,7 @@ RUN docker-php-ext-install \
     mbstring \
     pdo \
     pdo_mysql \
+    pdo_pgsql \
     pdo_sqlite \
     pcntl \
     tokenizer \
@@ -67,10 +69,9 @@ RUN docker-php-ext-install \
     zip
 
 # Install composer
-ENV COMPOSER_HOME /composer
 ENV PATH ./vendor/bin:/composer/vendor/bin:$PATH
 ENV COMPOSER_ALLOW_SUPERUSER 1
-RUN curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer
+RUN curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install PHP_CodeSniffer
 RUN composer global require "squizlabs/php_codesniffer=*"
@@ -81,8 +82,8 @@ RUN apk del -f .build-deps
 # Setup working directory
 WORKDIR /var/www
 
-CMD php ./bow run:server --port=80 --host=0.0.0.0
-
 EXPOSE 80
 
 HEALTHCHECK --interval=1m CMD curl -f http://localhost:80 || exit 1
+
+CMD php /var/www/bow run:server --port=80 --host=0.0.0.0
